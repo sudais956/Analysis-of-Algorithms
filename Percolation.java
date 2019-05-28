@@ -5,30 +5,31 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    /*
-    For the Percolation problem we model a percolation system using an n-by-n
-    grid of sites. Each site is either open or blocked. A full site is an open
-    site that can be connected to an open site in the top row via a chain of
-    neighboring (left, right, up, down) open sites. We say the system percolates
-    if there is a full site in the bottom row. In other words, a system
-    percolates if we fill all open sites connected to the top row and that
-    process fills some open site on the bottom row.
+    /**
+     * For the Percolation problem we model a percolation system using an n-by-n
+     * grid of sites. Each site is either open or blocked. A full site is an open
+     * site that can be connected to an open site in the top row via a chain of
+     * neighboring (left, right, up, down) open sites. We say the system percolates
+     * if there is a full site in the bottom row. In other words, a system
+     * percolates if we fill all open sites connected to the top row and that
+     * process fills some open site on the bottom row.
 
-    In my algorithm, grid is a multi-dimensional boolean array in which all the
-    sites are "blocked" at first. If a site is blocked, it will have the value
-    false
-
-    wqf makes use of the WeightedQuickUnionUF algorithm from Princeton's algs4
-    file
-    */
+     * In my algorithm, grid is a multi-dimensional boolean array in which all the
+     * sites are "blocked" at first. If a site is blocked, it will have the value
+     * false
+     
+     * @author Sudais Moorad
+     */
 
     private int num;
     private int top = 0;
     private int bottom;
     private boolean[][] grid;
     private WeightedQuickUnionUF wqf;
-
-    // create n-by-n grid, with all sites blocked
+    
+    /*
+     * create n-by-n grid, with all sites blocked
+     */
     public Percolation(int n) {
         if (n > 0) {
         num = n;
@@ -40,17 +41,21 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
     }
-
+    
+    /*
+     * takes the row and column number from a 3D array and
+     * returns the equivalent index numbers of a 2D array
+     */
     private int usableFormat(int p, int q) {
-        // usable format takes the row and column number from a 3D array and
-        // returns the equivalent index numbers of a 2D array
         return (p - 1) * num + q;
     }
-
-    // open site (row, col) if it is not open already
+    
+    /*
+     * open site (row, col) if it is not open already
+     */
     public void open(int row, int col) {
-        // changes the value of a site you want to open to true
         if (0 < row && row <= num && 0 < col && col <= num) {
+            // changes the value of a site you want to open to true
             grid[row - 1][col - 1] = true;
             if (row == 1) {
                 wqf.union(usableFormat(row, col), top);
@@ -79,8 +84,10 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
     }
-
-    // is site (row, col) open?
+    
+    /*
+     * is site (row, col) open?
+     */
     public boolean isOpen(int row, int col) {
         if (0 < row && row <= num && 0 < col && col <= num) {
         // returns true if (row, col) is open
@@ -90,8 +97,9 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
     }
-
-    // is site (row, col) full?
+    /*
+     * is site (row, col) full?
+     */
     public boolean isFull(int row, int col) {
         if (0 < row && row <= num && 0 < col && col <= num) {
             return wqf.connected(top, usableFormat(row, col));
@@ -99,10 +107,11 @@ public class Percolation {
         else {
             throw new IllegalArgumentException();
         }
-
     }
-
-    // number of open sites
+    
+    /*
+     * number of open sites
+     */
     public int numberOfOpenSites() {
         // count is the count of the number of open sites
         int count = 0;
@@ -117,8 +126,10 @@ public class Percolation {
         }
         return count;
     }
-
-    // does the system percolate?
+    
+    /*
+     * does the system percolate?
+     */
     public boolean percolates() {
         return wqf.connected(top, bottom);
     }
