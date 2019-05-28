@@ -1,17 +1,19 @@
-import java.lang.*;
-import java.util.*;
+import java.lang.IllegalArgumentException;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class PercolationStats {
     private int experiments;
     private Percolation perc;
     private double[] sumExps;
+    private double stdDev;
+    private double mean;
+    private double CONF_95 = 1.96;
+
     // perform trials independent experiments on an n-by-n grid
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0) {
-            throw new java.lang.IllegalArgumentException("The grid size and number of trials have to be at least 1");
+            throw new IllegalArgumentException("The grid size and number of trials have to be at least 1");
         }
         else {
             experiments = trials;
@@ -19,45 +21,42 @@ public class PercolationStats {
             for (int i = 0; i < experiments; i++) {
                 perc = new Percolation(n);
                 double sum = 0;
-                int counter = 0;
-                int openedSites = 0;
+                double openedSites = 0.0;
                 int row, col;
-                while(!perc.percolates()) {
-                    row = (int) (Math.random() * (n));
-                    col = (int) (Math.random() * (n));
+                while (!perc.percolates()) {
+                    row = StdRandom.uniform(1, n + 1);
+                    col = StdRandom.uniform(1, n + 1);
                     if (!perc.isOpen(row, col)) {
                         perc.open(row, col);
                         openedSites++;
                     }
-                    if (perc.percolates()) {
-                        counter++;
-                        break;
-                    }
                 }
                 sum += openedSites;
-                sumExps[i] = openedSites;
+                sumExps[i] = (openedSites / (n * n));
             }
+            mean = StdStats.mean(sumExps);
+            stdDev = StdStats.stddev(sumExps);
         }
     }
 
     // sample mean of percolation threshold
     public double mean() {
-        return StdStats.mean(sumExps);
+        return mean;
     }
 
     // sample standard deviation of percolation threshold
     public double stddev() {
-        return StdStats.stddev(sumExps);
+        return stdDev;
     }
 
     // low  endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - ((1.96 * stddev()) / Math.sqrt(experiments));
+        return mean - ((CONF_95 * stdDev) / Math.sqrt(experiments));
     }
 
     // high endpoint of 95% confidence interval
-    public double confidenceHi(){
-        return mean() + ((1.96 * stddev()) / Math.sqrt(experiments));
+    public double confidenceHi() {
+        return mean + ((CONF_95 * stdDev) / Math.sqrt(experiments));
     }
 
     public static void main(String[] args) {
@@ -65,9 +64,9 @@ public class PercolationStats {
         int trials = Integer.parseInt(args[1]);
         PercolationStats percStats = new PercolationStats(n, trials);
 
-        String confidence = percStats.confidenceLo() + ", " + percStats.confidenceHi();
         System.out.println("mean                    = " + percStats.mean());
         System.out.println("stddev                  = " + percStats.stddev());
+        String confidence = percStats.confidenceLo() + ", " + percStats.confidenceHi();
         System.out.println("95% confidence interval = [" + confidence + "]");
     }
 }
