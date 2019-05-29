@@ -64,11 +64,11 @@ public class Percolation {
                 wqf.union(usableFormat(row, col), bottom);
             }
             if (row > 1 && isOpen(row - 1, col)) {
-                // links the new row and col to an already open one below it
+                // links the new row and col to an already open one above it
                 wqf.union(usableFormat(row, col), usableFormat(row - 1, col));
             }
             if (row < num && isOpen(row + 1, col)) {
-                // links the new row and col to an already open one above it
+                // links the new row and col to an already open one below it
                 wqf.union(usableFormat(row, col), usableFormat(row + 1, col));
             }
             if (col > 1 && isOpen(row, col - 1)) {
